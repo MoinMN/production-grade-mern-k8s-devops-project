@@ -1,0 +1,49 @@
+services:
+
+  mongodb:
+    image: mongo:6
+    container_name: portfolio-mongodb
+    restart: always
+
+    volumes:
+      - mongodb_data:/data/db
+
+    networks:
+      - portfolio-network
+
+  backend:
+    image: moinnaik/portfolio-backend:v1
+    container_name: portfolio-backend
+    restart: always
+
+    env_file:
+      - ./backend/.env
+
+    depends_on:
+      - mongodb
+
+    networks:
+      - portfolio-network
+
+  frontend:
+    image: moinnaik/portfolio-frontend:v1
+    container_name: portfolio-frontend
+    restart: always
+
+    env_file:
+      - ./frontend/.env
+
+    ports:
+      - "80:80"
+
+    depends_on:
+      - backend
+
+    networks:
+      - portfolio-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  portfolio-network:
