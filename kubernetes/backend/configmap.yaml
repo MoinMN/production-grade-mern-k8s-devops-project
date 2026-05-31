@@ -7,7 +7,7 @@ metadata:
 
 data:
   SMTP_USER: "pixelmint.mail@gmail.com"
-  FRONTEND_URL: "http://52.66.197.225"
+  FRONTEND_URL: "http://13.126.253.67/"
   SMTP_HOST: "smtp.gmail.com"
   PORT: "4518"
   DEV_EMAIL: "moinnaik98@gmail.com"
