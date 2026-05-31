@@ -3,6 +3,7 @@ kind: ConfigMap
 
 metadata:
   name: frontend-config
+  namespace: portfolio
 
 data:
   VITE_API_URL: "http://backend-service:4518"

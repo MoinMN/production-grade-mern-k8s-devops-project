@@ -2,6 +2,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: mongodb-pv-1
+  namespace: portfolio
 
 spec:
   capacity:
@@ -25,6 +26,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: mongodb-pv-2
+  namespace: portfolio
 
 spec:
   capacity:
@@ -48,6 +50,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: mongodb-pv-3
+  namespace: portfolio
 
 spec:
   capacity:

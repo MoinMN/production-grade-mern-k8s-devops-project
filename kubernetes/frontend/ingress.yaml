@@ -3,6 +3,7 @@ kind: Ingress
 
 metadata:
   name: portfolio-ingress
+  namespace: portfolio
 
 spec:
   ingressClassName: nginx

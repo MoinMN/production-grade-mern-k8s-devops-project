@@ -3,6 +3,7 @@ kind: ConfigMap
 
 metadata:
   name: backend-config
+  namespace: portfolio
 
 data:
   SMTP_USER: "pixelmint.mail@gmail.com"
