@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: backend-config
+
+data:
+  SMTP_USER: "pixelmint.mail@gmail.com"
+  FRONTEND_URL: "http://52.66.197.225"
+  SMTP_HOST: "smtp.gmail.com"
+  PORT: "4518"
+  DEV_EMAIL: "moinnaik98@gmail.com"
+  DEFAULT_CLIENT_IMG_SRC: "/src/assets/default-client-profile.jpg"

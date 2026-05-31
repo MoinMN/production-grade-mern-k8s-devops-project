@@ -8,10 +8,8 @@ metadata:
 spec:
   selector:
     app: backend
-
   ports:
-  - protocol: TCP
-    port: 4518
-    targetPort: 4518
-
+    - protocol: TCP
+      port: 4518
+      targetPort: 4518
   type: ClusterIP
