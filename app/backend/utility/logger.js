@@ -1,4 +1,6 @@
 import winston from "winston";
+import { config } from "dotenv";
+config();
 
 const logger = winston.createLogger({
   level: "info",
@@ -6,7 +8,7 @@ const logger = winston.createLogger({
     winston.format.timestamp(),
     winston.format.json(), // AWS CloudWatch reads JSON perfectly
   ),
-  defaultMeta: { service: "portfolio-backend" },
+  defaultMeta: { service: process.env.BACKEND_SERVICE_NAME },
   transports: [
     new winston.transports.Console(), // AWS captures stdout/stderr directly
   ],

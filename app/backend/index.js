@@ -6,6 +6,7 @@ import fileUpload from "express-fileupload";
 import os from "os";
 import morgan from "morgan";
 import logger from "./utility/logger.js";
+import "./utility/apm-agent.js";
 
 const app = express();
 const PORT = process.env.PORT || 4518;
