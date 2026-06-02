@@ -12,3 +12,6 @@ data:
   PORT: "4518"
   DEV_EMAIL: "moinnaik98@gmail.com"
   DEFAULT_CLIENT_IMG_SRC: "/src/assets/default-client-profile.jpg"
+  APM_URL: "http://10.0.2.160"
+  APM_PORT: "8200"
+  BACKEND_SERVICE_NAME: "portfolio-backend"
