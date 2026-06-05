@@ -1,15 +1,19 @@
 pipeline {
   agent any
+
   environment {
     AWS_REGION = 'ap-south-1'
     ECR_REPO = '123456789012.dkr.ecr.ap-south-1.amazonaws.com/portfolio-backend'
   }
 
   stages {
+
     stage('Build Image') {
       steps {
-        dir('app/backend') {
-          sh 'docker build -t backend .'
+        script {
+          dir('app/backend') {
+            sh 'docker build -t portfolio-backend .'
+          }
         }
       }
     }
@@ -31,7 +35,6 @@ pipeline {
       steps {
         sh '''
         docker tag portfolio-backend:latest $ECR_REPO:latest
-
         docker push $ECR_REPO:latest
         '''
       }
