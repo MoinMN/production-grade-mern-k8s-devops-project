@@ -7,8 +7,10 @@ pipeline {
 
   stages {
     stage('Build Image') {
-      dir('app/backend') {
-        sh 'docker build -t backend .'
+      steps {
+        dir('app/backend') {
+          sh 'docker build -t backend .'
+        }
       }
     }
 
