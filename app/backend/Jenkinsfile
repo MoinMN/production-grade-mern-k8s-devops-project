@@ -12,7 +12,7 @@ pipeline {
       steps { 
         script {
           dir('app/backend') {
-            sh 'docker build -t portfolio-backend .'
+            sh 'docker build -t portfolio-backend:$BUILD_NUMBER .'
           }
         }
       }
@@ -34,8 +34,8 @@ pipeline {
     stage('Push Image') {
       steps {
         sh '''
-        docker tag portfolio-backend:latest $ECR_REPO:latest
-        docker push $ECR_REPO:latest
+        docker tag portfolio-backend:latest $ECR_REPO:$BUILD_NUMBER
+        docker push $ECR_REPO:$BUILD_NUMBER
         '''
       }
     }
@@ -44,7 +44,7 @@ pipeline {
       steps {
         sh '''
         kubectl set image deployment/backend \
-        backend=$ECR_REPO:latest \
+        backend=$ECR_REPO:$BUILD_NUMBER \
         -n portfolio
 
         kubectl rollout status deployment/backend \
