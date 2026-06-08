@@ -21,7 +21,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
-                    docker build -t ${ECR_REPO}:${IMAGE_TAG} ./backend
+                    docker build -t ${ECR_REPO}:${IMAGE_TAG} ./app/backend
                 '''
             }
         }
