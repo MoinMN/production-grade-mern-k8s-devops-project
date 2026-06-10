@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main',
+                git branch: 'prod',
                     url: 'https://github.com/MoinMN/production-grade-mern-k8s-devops-project.git'
             }
         }
