@@ -21,7 +21,7 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                dir('/app/backend') {
+                dir('../app/backend') {
                     sh 'npm install'
                 }
             }
@@ -29,7 +29,7 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                dir('/app/backend') {
+                dir('../app/backend') {
                     sh 'npm test || true'
                 }
             }
