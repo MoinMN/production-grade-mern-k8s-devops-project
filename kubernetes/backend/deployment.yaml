@@ -33,6 +33,8 @@ spec:
                 sleep 5
               done
 
+      revisionHistoryLimit: 3
+      
       containers:
         - name: backend
           image: moinnaik/portfolio-backend:latest

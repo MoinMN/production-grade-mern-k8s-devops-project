@@ -29,6 +29,7 @@ spec:
                 echo "Waiting for Backend..."
                 sleep 5
               done
+      revisionHistoryLimit: 3
       containers:
         - name: frontend
           image: moinnaik/portfolio-frontend:latest
@@ -60,3 +61,11 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 3
             failureThreshold: 3
+            
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
