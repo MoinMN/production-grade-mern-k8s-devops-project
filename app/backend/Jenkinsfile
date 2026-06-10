@@ -21,7 +21,7 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                dir('../app/backend') {
+                dir('app/backend') {
                     sh 'npm install'
                 }
             }
@@ -29,7 +29,7 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                dir('../app/backend') {
+                dir('app/backend') {
                     sh 'npm test || true'
                 }
             }
@@ -41,7 +41,7 @@ pipeline {
                     docker build \
                     -t ${IMAGE_NAME}:${IMAGE_TAG} \
                     -t ${IMAGE_NAME}:${LATEST_TAG} \
-                    /app/backend
+                    app/backend
                 """
             }
         }
