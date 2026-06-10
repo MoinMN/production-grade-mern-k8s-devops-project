@@ -41,6 +41,7 @@ app.get("/health", (req, res) => {
     status: "UP",
     pod: os.hostname(),
     timestamp: new Date().toISOString(),
+    update: true
   });
 });
 

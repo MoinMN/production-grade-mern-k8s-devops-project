@@ -1,12 +1,17 @@
-import { useState, useEffect } from 'react';
-import Check from 'react-bootstrap/FormCheck';
-import Card from 'react-bootstrap/Card';
-import Table from 'react-bootstrap/Table';
-import { GetTestimonial, AddTestimonial, DeleteTestimonial, ToggleApprovedTestimonial } from '../../api/clienttestimonial.api';
-import Alert from '../../components/Alert';
-import ModalBox from '../../components/admin/Modal';
-import ModalForm from '../../components/admin/ModalForm';
-import Loading from '@/components/admin/Loading';
+import { useState, useEffect } from "react";
+import Check from "react-bootstrap/FormCheck";
+import Card from "react-bootstrap/Card";
+import Table from "react-bootstrap/Table";
+import {
+  GetTestimonial,
+  AddTestimonial,
+  DeleteTestimonial,
+  ToggleApprovedTestimonial,
+} from "../../api/clienttestimonial.api";
+import Alert from "../../components/Alert";
+import ModalBox from "../../components/admin/Modal";
+import ModalForm from "../../components/admin/ModalForm";
+import Loading from "@/components/admin/Loading";
 
 const ClientTestimonial = () => {
   // testimonial list store here
@@ -16,21 +21,21 @@ const ClientTestimonial = () => {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  // alert 
+  // alert
   const [showAlert, setShowAlert] = useState(false);
-  const [messageAlert, setMessageAlert] = useState('');
-  const [variantAlert, setVariantAlert] = useState('');
+  const [messageAlert, setMessageAlert] = useState("");
+  const [variantAlert, setVariantAlert] = useState("");
 
-  // modal 
+  // modal
   const [showModal, setShowModal] = useState(false);
   const [modalInfo, setModalInfo] = useState({
-    title: 'Confirmation',
-    body: '',
+    title: "Confirmation",
+    body: "",
     secondaryBtn: "Cancel",
     secondaryBtnVariant: "secondary",
     primaryBtn: "",
     primaryBtnVariant: "",
-    confirmAction: null
+    confirmAction: null,
   });
   const closeModal = () => setShowModal(false);
 
@@ -38,13 +43,13 @@ const ClientTestimonial = () => {
 
   const closeModalToPost = () => {
     setModalToPost(false);
-  }
+  };
 
   const [refreshData, setRefreshData] = useState(false);
 
   // calculate date of client testimonial
   const calculateElapsedTime = (dateOfPost) => {
-    if (!dateOfPost) return 'Time Not Available!'
+    if (!dateOfPost) return "Time Not Available!";
     const now = new Date();
     const postedDate = new Date(dateOfPost);
     const elapsedSeconds = Math.floor((now - postedDate) / 1000); // Convert milliseconds to seconds
@@ -71,23 +76,27 @@ const ClientTestimonial = () => {
       prev.map((testimonial) =>
         testimonial?.email === email
           ? { ...testimonial, isApproved: isChecked }
-          : testimonial
-      )
+          : testimonial,
+      ),
     );
     ToggleApprovedTestimonial(email, isChecked)
-      .then(res => {
+      .then((res) => {
         setMessageAlert(res.message);
-        setVariantAlert(res.message === 'Client Testimonial Successfully Approved!' ? 'success' : 'warning');
+        setVariantAlert(
+          res.message === "Client Testimonial Successfully Approved!"
+            ? "success"
+            : "warning",
+        );
       })
-      .catch(err => {
+      .catch((err) => {
         setMessageAlert(err);
-        setVariantAlert('danger');
+        setVariantAlert("danger");
       })
       .finally(() => {
         setRefreshData((prev) => !prev);
         setShowAlert(true);
-      })
-  }
+      });
+  };
 
   const handleDelete = (_id, name) => {
     setModalInfo({
@@ -95,32 +104,32 @@ const ClientTestimonial = () => {
       body: `Do you really want to delete ${name} his/her testimonial?`,
       primaryBtn: "Delete",
       primaryBtnVariant: "danger",
-      confirmAction: () => handleConfirmDelete(_id)
-    })
+      confirmAction: () => handleConfirmDelete(_id),
+    });
     setShowModal(true);
-  }
+  };
 
   const handleConfirmDelete = (_id) => {
     DeleteTestimonial(_id)
-      .then(res => {
+      .then((res) => {
         setMessageAlert(res.message);
-        setVariantAlert('warning');
+        setVariantAlert("warning");
         setRefreshData((prev) => !prev);
       })
-      .catch(err => {
+      .catch((err) => {
         setMessageAlert(err);
-        setVariantAlert('danger');
+        setVariantAlert("danger");
       })
       .finally(() => {
         setShowAlert(true);
         // ensure modal is close
         closeModal();
       });
-  }
+  };
 
   const handleNewClientTestimonial = () => {
     setModalToPost(true);
-  }
+  };
 
   const handleConfirmSubmit = (e) => {
     e.preventDefault();
@@ -128,58 +137,66 @@ const ClientTestimonial = () => {
     const sendMail = e.target.sendMail.checked;
 
     if (!email) {
-      setMessageAlert('Client Email Required!');
-      setVariantAlert('danger');
+      setMessageAlert("Client Email Required!");
+      setVariantAlert("danger");
       setShowAlert(true);
       return;
     }
 
     AddTestimonial(email, sendMail)
-      .then(res => {
+      .then((res) => {
         setMessageAlert(res.message);
-        setVariantAlert('success');
-        if (res.message === 'Email Required!') setVariantAlert('danger');
-        if (res.message === 'Client Email Already Exist!') setVariantAlert('warning');
+        setVariantAlert("success");
+        if (res.message === "Email Required!") setVariantAlert("danger");
+        if (res.message === "Client Email Already Exist!")
+          setVariantAlert("warning");
       })
-      .catch(err => {
+      .catch((err) => {
         setMessageAlert(err);
-        setVariantAlert('danger');
+        setVariantAlert("danger");
       })
       .finally(() => {
         setShowAlert(true);
         setRefreshData((prev) => !prev);
         //ensure modal to close
         closeModalToPost();
-      })
-  }
+      });
+  };
 
   useEffect(() => {
     GetTestimonial()
-      .then(res => {
+      .then((res) => {
         if (res?.message) return;
-        console.log(res)
+        console.log(res);
         // filter completed testimonial
-        const filterCompleted = res.filter(testimonial => testimonial?.name && testimonial?.comment)
+        const filterCompleted = res.filter(
+          (testimonial) => testimonial?.name && testimonial?.comment,
+        );
         // filter pending testimonial
-        const filterPending = res.filter(testimonial => !testimonial?.name && !testimonial?.comment)
+        const filterPending = res.filter(
+          (testimonial) => !testimonial?.name && !testimonial?.comment,
+        );
         setTestimonialList(filterCompleted);
         setTestimonialPendingList(filterPending);
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       })
-      .finally(() => setIsLoading(false))
+      .finally(() => setIsLoading(false));
   }, [refreshData, setRefreshData]);
 
-  if (isLoading) return <Loading />
+  if (isLoading) return <Loading />;
 
   return (
     <>
       <div className="flex flex-col justify-around lg:flex-row items-start gap-4 p-4 text-sm sm:text-base md:text-lg max-sm:p-3 max-sm:gap-3 poppins">
         <div className="flex flex-wrap justify-around items-stretch gap-4">
           {testimonialList?.map((testimonial, index) => (
-            <Card className="text-center max-w-[550px] shadow-md border-2 border-light-primary rounded-md" key={index}>
-              <Card.Header className='flex justify-around items-center gap-6 max-sm:gap-2'>
+            <Card
+              className="text-center max-w-[550px] shadow-md border-2 border-light-primary rounded-md"
+              key={index}
+            >
+              <Card.Header className="flex justify-around items-center gap-6 max-sm:gap-2">
                 <div className="flex items-center gap-3">
                   <img
                     src={testimonial?.profile}
@@ -190,13 +207,17 @@ const ClientTestimonial = () => {
                     type="switch"
                     label="Want to Display?"
                     checked={testimonial?.isApproved}
-                    className='mx-2'
-                    onChange={(e) => handleSwitchChange(e.target.checked, testimonial?.email)}
+                    className="mx-2"
+                    onChange={(e) =>
+                      handleSwitchChange(e.target.checked, testimonial?.email)
+                    }
                   />
                 </div>
                 <i
-                  className='fa-solid fa-trash-can cursor-pointer mx-2 text-xl md:text-2xl hover:text-red-500 transition-all duration-200 ease-in-out'
-                  onClick={() => handleDelete(testimonial?._id, testimonial?.name)}
+                  className="fa-solid fa-trash-can cursor-pointer mx-2 text-xl md:text-2xl hover:text-red-500 transition-all duration-200 ease-in-out"
+                  onClick={() =>
+                    handleDelete(testimonial?._id, testimonial?.name)
+                  }
                   onMouseEnter={(e) => {
                     e.currentTarget.classList.add("fa-regular");
                     e.currentTarget.classList.remove("fa-solid");
@@ -207,18 +228,14 @@ const ClientTestimonial = () => {
                   }}
                 />
               </Card.Header>
-              <Card.Body className='flex flex-col gap-1'>
-                <Card.Title className='text-xl sm:text-2xl md:text-3xl text-light-primary'>
+              <Card.Body className="flex flex-col gap-1">
+                <Card.Title className="text-xl sm:text-2xl md:text-3xl text-light-primary">
                   {testimonial?.name}
                 </Card.Title>
                 <Card.Subtitle>
-                  <b>
-                    {testimonial?.email}
-                  </b>
+                  <b>{testimonial?.email}</b>
                 </Card.Subtitle>
-                <Card.Text>
-                  {testimonial?.comment}
-                </Card.Text>
+                <Card.Text>{testimonial?.comment}</Card.Text>
               </Card.Body>
               <Card.Footer className="sm:text-sm md:text-base text-light-text2 ">
                 {calculateElapsedTime(testimonial?.createdAt)}
@@ -241,13 +258,10 @@ const ClientTestimonial = () => {
           </div>
         </div>
 
-
         {testimonialPendingList.length !== 0 && (
           <div className="w-[300px] h-auto sticky top-28 self-start">
-            <h3 className='text-2xl my-2'>
-              Pending Testimonial
-            </h3>
-            <Table striped borderless hover responsive='sm'>
+            <h3 className="text-2xl my-2">Pending Testimonial</h3>
+            <Table striped borderless hover responsive="sm">
               <thead>
                 <tr>
                   <th>#</th>
@@ -258,16 +272,14 @@ const ClientTestimonial = () => {
               <tbody>
                 {testimonialPendingList?.map((testimonial, index) => (
                   <tr key={index}>
-                    <td className='text-center'>
-                      {index + 1}.
-                    </td>
-                    <td>
-                      {testimonial?.email}
-                    </td>
-                    <td className='text-center'>
+                    <td className="text-center">{index + 1}.</td>
+                    <td>{testimonial?.email}</td>
+                    <td className="text-center">
                       <i
-                        className='fa-solid fa-trash-can cursor-pointer text-xl md:text-2xl hover:text-red-500 transition-all duration-200 ease-in-out'
-                        onClick={() => handleDelete(testimonial?._id, testimonial?.email)}
+                        className="fa-solid fa-trash-can cursor-pointer text-xl md:text-2xl hover:text-red-500 transition-all duration-200 ease-in-out"
+                        onClick={() =>
+                          handleDelete(testimonial?._id, testimonial?.email)
+                        }
                         onMouseEnter={(e) => {
                           e.currentTarget.classList.add("fa-regular");
                           e.currentTarget.classList.remove("fa-solid");
@@ -286,19 +298,16 @@ const ClientTestimonial = () => {
         )}
       </div>
 
-
-
-
       {/* Modal from for edit and update data  */}
       <ModalForm
         showModalToPost={showModalToPost}
         closeModalToPost={closeModalToPost}
         handleConfirmSubmit={handleConfirmSubmit}
-        formType='testimonial'
+        formType="testimonial"
       />
 
       {/* alert  */}
-      < Alert
+      <Alert
         variant={variantAlert}
         showAlert={showAlert}
         message={messageAlert}
@@ -306,7 +315,7 @@ const ClientTestimonial = () => {
       />
 
       {/* Modal Box  */}
-      < ModalBox
+      <ModalBox
         show={showModal}
         close={closeModal}
         title={modalInfo.title}
@@ -318,7 +327,7 @@ const ClientTestimonial = () => {
         confirmAction={modalInfo.confirmAction}
       />
     </>
-  )
-}
+  );
+};
 
-export default ClientTestimonial
+export default ClientTestimonial;
