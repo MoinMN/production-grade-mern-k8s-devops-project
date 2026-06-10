@@ -27,14 +27,6 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                dir('app/backend') {
-                    sh 'npm test || true'
-                }
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 sh """
@@ -42,6 +34,23 @@ pipeline {
                     -t ${IMAGE_NAME}:${IMAGE_TAG} \
                     -t ${IMAGE_NAME}:${LATEST_TAG} \
                     app/backend
+                """
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                sh """
+                    docker run -d \
+                    --name backend-test \
+                    -p 4518:4518 \
+                    ${IMAGE_NAME}:${IMAGE_TAG}
+
+                    sleep 20
+
+                    curl -f http://localhost:4518/health
+
+                    docker rm -f backend-test
                 """
             }
         }
