@@ -4,6 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = "moinnaik/portfolio-backend"
         IMAGE_TAG  = "${BUILD_NUMBER}"
+        LATEST_TAG = "latest"
 
         WORKER1 = "10.0.2.145"
         WORKER2 = "10.0.2.151"
@@ -39,6 +40,7 @@ pipeline {
                 sh """
                     docker build \
                     -t ${IMAGE_NAME}:${IMAGE_TAG} \
+                    -t ${IMAGE_NAME}:${LATEST_TAG} \
                     /app/backend
                 """
             }
@@ -66,6 +68,7 @@ pipeline {
             steps {
                 sh """
                     docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                    docker push ${IMAGE_NAME}:${LATEST_TAG}
                 """
             }
         }
@@ -139,10 +142,10 @@ pipeline {
                 ]) {
 
                     sh '''
-                        export KUBECONFIG=$KUBECONFIG_FILE
+                        export KUBECONFIG=${KUBECONFIG_FILE}
 
                         kubectl set image deployment/backend \
-                        backend=''' + "${IMAGE_NAME}:${IMAGE_TAG}" + ''' \
+                        backend=${IMAGE_NAME}:${IMAGE_TAG} \
                         -n portfolio
 
                         kubectl rollout status deployment/backend \
