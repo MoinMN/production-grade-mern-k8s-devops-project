@@ -10,7 +10,6 @@ export const Get = async (req, res) => {
   }
 }
 
-
 export const Update = async (req, res) => {
   try {
     const { tagLineSkills, aboutMeContent } = req.body;
