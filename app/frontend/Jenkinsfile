@@ -11,12 +11,12 @@ pipeline {
 
   stages {
 
-        stage('Checkout') {
+      stage('Checkout') {
           steps {
               git branch: 'main',
                   url: 'https://github.com/MoinMN/production-grade-mern-k8s-devops-project.git'
           }
-        }
+      }
 
       stage('Build Docker Image') {
           steps {
@@ -29,28 +29,27 @@ pipeline {
           }
       }
 
-        stage('Frontend Health Check') {
-            steps {
-                sh '''
-                    docker rm -f frontend-test || true
+      stage('Frontend Health Check') {
+        steps {
+            sh '''
+                docker rm -f frontend-test || true
 
-                    docker run -d \
-                    --name frontend-test \
-                    -p 80:80 \
-                    ${IMAGE_NAME}:${IMAGE_TAG}
+                docker run -d \
+                --name frontend-test \
+                -p 80:80 \
+                ${IMAGE_NAME}:${IMAGE_TAG}
 
-                    sleep 15
+                sleep 15
 
-                    STATUS=$(curl -o /dev/null -s -w "%{http_code}" http://localhost:80)
+                STATUS=$(curl -o /dev/null -s -w "%{http_code}" http://localhost:80)
 
-                    if [ "$STATUS" != "200" ]; then
-                        echo "Frontend health check failed"
-                        exit 1
-                    fi
+                if [ "$STATUS" != "200" ]; then
+                    echo "Frontend health check failed"
+                    exit 1
+                fi
 
-                    docker rm -f frontend-test
-                '''
-            }
+                docker rm -f frontend-test
+            '''
         }
     }
 
