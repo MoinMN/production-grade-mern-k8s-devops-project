@@ -1,17 +1,17 @@
-import FloatingLabel from 'react-bootstrap/FloatingLabel';
-import InputGroup from 'react-bootstrap/InputGroup';
-import Spinner from 'react-bootstrap/Spinner';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import FloatingLabel from "react-bootstrap/FloatingLabel";
+import InputGroup from "react-bootstrap/InputGroup";
+import Spinner from "react-bootstrap/Spinner";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
-import Alert from '../components/Alert';
-import { AuthUser } from '../api/auth.api';
-import BASE_URL from '../config/BackendURL';
-import Loading from '../components/admin/Loading';
-import BackgroundVideo from '../assets/bg-admin.mp4';
+import Alert from "../components/Alert";
+import { AuthUser } from "../api/auth.api";
+import BASE_URL from "../config/BackendURL";
+import Loading from "../components/admin/Loading";
+import BackgroundVideo from "../assets/bg-admin.mp4";
 import { Helmet } from "react-helmet-async";
 
 const Login = () => {
@@ -23,15 +23,15 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoginLoading, setIsLoginLoading] = useState(false);
 
-  // alert 
+  // alert
   const [showAlert, setShowAlert] = useState(false);
-  const [messageAlert, setMessageAlert] = useState('');
-  const [variantAlert, setVariantAlert] = useState('');
+  const [messageAlert, setMessageAlert] = useState("");
+  const [variantAlert, setVariantAlert] = useState("");
 
   useEffect(() => {
     AuthUser()
-      .then(res => {
-        if (res.isAuthenticated) return navigate('/admin/dashboard');
+      .then((res) => {
+        if (res.isAuthenticated) return navigate("/admin/dashboard");
       })
       .finally(() => {
         setIsLoading(false);
@@ -44,12 +44,12 @@ const Login = () => {
 
     try {
       // const formData = new FormData(e.target);
-      const username = new FormData(e.target).get('username');
-      const password = new FormData(e.target).get('password');
+      const username = new FormData(e.target).get("username");
+      const password = new FormData(e.target).get("password");
 
       if (!username || !password) {
-        setMessageAlert('All Fields Required!');
-        setVariantAlert('danger');
+        setMessageAlert("All Fields Required!");
+        setVariantAlert("danger");
         setShowAlert(true);
         return;
       }
@@ -57,30 +57,30 @@ const Login = () => {
       const response = await axios.post(
         `${BASE_URL}/auth/login`,
         { username, password },
-        { withCredentials: true }
-      )
+        { withCredentials: true },
+      );
 
       if (response.status === 200) {
         setMessageAlert(response.data.message);
-        setVariantAlert('success');
+        setVariantAlert("success");
         const params = new URLSearchParams(location.search);
-        const redirectPath = params.get('redirect');
+        const redirectPath = params.get("redirect");
 
         if (redirectPath) {
           navigate(redirectPath);
         } else {
-          navigate('/admin/dashboard');
+          navigate("/admin/dashboard");
         }
       }
     } catch (error) {
       console.log(`Error while login\nError => `, error);
       setMessageAlert(error.response.data.message);
-      setVariantAlert('danger');
+      setVariantAlert("danger");
     } finally {
       setShowAlert(true);
       setIsLoginLoading(false);
     }
-  }
+  };
 
   return (
     <>
@@ -99,10 +99,13 @@ const Login = () => {
         />
       </Helmet>
 
-      {isLoading
-        ? <Loading />
-        : <>
-          <div className={`min-h-screen flex justify-center items-center courier text-base text-black`}>
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <>
+          <div
+            className={`min-h-screen flex justify-center items-center courier text-base text-black`}
+          >
             {/* video  */}
             <video
               autoPlay
@@ -114,43 +117,56 @@ const Login = () => {
               Your browser does not support the video tag.
             </video>
             <div className="w-2/3 flex justify-center items-center max-lg:w-11/12 max-md:text-sm">
-              <Form onSubmit={handleSubmit} className={`w-4/5 px-2 py-6 rounded-md backdrop-blur-sm border-2 bg-white/25 shadow-md max-md:w-full`}>
+              <Form
+                onSubmit={handleSubmit}
+                className={`w-4/5 px-2 py-6 rounded-md backdrop-blur-sm border-2 bg-white/25 shadow-md max-md:w-full`}
+              >
                 <div className="mb-10 text-center">
-                  <h3 className='text-white text-3xl max-md:text-2xl'>
+                  <h3 className="text-white text-3xl max-md:text-2xl">
                     Only Moin MN can login!
                   </h3>
                 </div>
                 <div className="grid gap-2 w-1/2 m-auto max-md:w-4/5">
                   <div className={`border-2 border-light-primary rounded-lg`}>
-                    <FloatingLabel controlId="floatingUsername" label="Username">
+                    <FloatingLabel
+                      controlId="floatingUsername"
+                      label="Username"
+                    >
                       <Form.Control
                         className="focus:ring-0"
                         type="text"
                         placeholder="Username"
-                        autoComplete='username'
-                        name='username'
+                        autoComplete="username"
+                        name="username"
                       />
                     </FloatingLabel>
                   </div>
-                  <InputGroup className='border-2 border-light-primary rounded-lg'>
-                    <FloatingLabel controlId="floatingPassword" label="Password">
+                  <InputGroup className="border-2 border-light-primary rounded-lg">
+                    <FloatingLabel
+                      controlId="floatingPassword"
+                      label="Password"
+                    >
                       <Form.Control
                         className="focus:ring-0"
-                        type={isEyeOpen ? 'text' : 'password'}
+                        type={isEyeOpen ? "text" : "password"}
                         placeholder="Password"
                         autoComplete="password"
-                        name='password'
+                        name="password"
                       />
                     </FloatingLabel>
                     <InputGroup.Text
-                      className='cursor-pointer'
+                      className="cursor-pointer"
                       onClick={(e) => {
                         setIsEyeOpen(!isEyeOpen);
-                        e.currentTarget.querySelector('span i').classList.toggle('fa-eye');
-                        e.currentTarget.querySelector('span i').classList.toggle('fa-eye-slash');
+                        e.currentTarget
+                          .querySelector("span i")
+                          .classList.toggle("fa-eye");
+                        e.currentTarget
+                          .querySelector("span i")
+                          .classList.toggle("fa-eye-slash");
                       }}
                     >
-                      <span className='flex justify-center items-center max-sm:text-sm'>
+                      <span className="flex justify-center items-center max-sm:text-sm">
                         <i className="fa-solid fa-eye" />
                       </span>
                     </InputGroup.Text>
@@ -174,18 +190,16 @@ const Login = () => {
                     Log In
                   </Button>
                 </div>
-                <div className='flex flex-col justify-center items-center mt-6'>
-                  <span className='text-slate-300'>
-                    Admin Dashboard
-                  </span>
+                <div className="flex flex-col justify-center items-center mt-6">
+                  <span className="text-slate-300">Admin Dashboard</span>
                 </div>
               </Form>
             </div>
           </div>
         </>
-      }
+      )}
     </>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;
