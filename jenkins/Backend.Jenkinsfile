@@ -1,0 +1,185 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "moinnaik/portfolio-backend"
+        IMAGE_TAG  = "${BUILD_NUMBER}"
+        LATEST_TAG = "latest"
+
+        WORKER1 = "10.0.2.145"
+        WORKER2 = "10.0.2.151"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'prod',
+                    url: 'https://github.com/MoinMN/production-grade-mern-k8s-devops-project.git'
+            }
+        }
+
+        stage('Backend Pipeline') {
+
+            when {
+                changeset "app/backend/**"
+            }
+
+            stages {
+
+                stage('Build Docker Image') {
+                    steps {
+                        sh """
+                            docker build \
+                            -t ${IMAGE_NAME}:${IMAGE_TAG} \
+                            -t ${IMAGE_NAME}:${LATEST_TAG} \
+                            app/backend
+                        """
+                    }
+                }
+
+                stage('Health Check') {
+                    steps {
+                        sh """
+                            docker run -d \
+                            --name backend-test \
+                            -p 4518:4518 \
+                            ${IMAGE_NAME}:${IMAGE_TAG}
+
+                            sleep 20
+
+                            curl -f http://localhost:4518/health
+
+                            docker rm -f backend-test
+                        """
+                    }
+                }
+
+                stage('DockerHub Login') {
+                    steps {
+                        withCredentials([
+                            usernamePassword(
+                                credentialsId: 'docker',
+                                usernameVariable: 'DOCKER_USER',
+                                passwordVariable: 'DOCKER_PASS'
+                            )
+                        ]) {
+                            sh '''
+                                echo $DOCKER_PASS | docker login \
+                                -u $DOCKER_USER \
+                                --password-stdin
+                            '''
+                        }
+                    }
+                }
+
+                stage('Push To DockerHub') {
+                    steps {
+                        sh """
+                            docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                            docker push ${IMAGE_NAME}:${LATEST_TAG}
+                        """
+                    }
+                }
+
+                stage('Create Offline Image Tar') {
+                    steps {
+                        sh """
+                            docker save \
+                            -o backend-latest.tar \
+                            ${IMAGE_NAME}:latest
+                        """
+                    }
+                }
+
+                stage('Copy Tar To Worker-1') {
+                    steps {
+                        sshagent(['worker-ssh']) {
+                            sh """
+                                scp -o StrictHostKeyChecking=no \
+                                backend-latest.tar \
+                                ubuntu@${WORKER1}:/tmp/
+                            """
+                        }
+                    }
+                }
+
+                stage('Import Image Worker-1') {
+                    steps {
+                        sshagent(['worker-ssh']) {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no \
+                                ubuntu@${WORKER1} \
+                                'sudo ctr -n k8s.io images import /tmp/backend-latest.tar'
+                            """
+                        }
+                    }
+                }
+
+                stage('Copy Tar To Worker-2') {
+                    steps {
+                        sshagent(['worker-ssh']) {
+                            sh """
+                                scp -o StrictHostKeyChecking=no \
+                                backend-latest.tar \
+                                ubuntu@${WORKER2}:/tmp/
+                            """
+                        }
+                    }
+                }
+
+                stage('Import Image Worker-2') {
+                    steps {
+                        sshagent(['worker-ssh']) {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no \
+                                ubuntu@${WORKER2} \
+                                'sudo ctr -n k8s.io images import /tmp/backend-latest.tar'
+                            """
+                        }
+                    }
+                }
+
+                stage('Deploy To Kubernetes') {
+                    steps {
+                        withCredentials([
+                            file(
+                                credentialsId: 'kubeconfig',
+                                variable: 'KUBECONFIG_FILE'
+                            )
+                        ]) {
+                            sh '''
+                                export KUBECONFIG=$KUBECONFIG_FILE
+
+                                kubectl rollout restart deployment/backend \
+                                -n portfolio
+
+                                kubectl rollout status deployment/backend \
+                                -n portfolio --timeout=300s
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Deployment Successful"
+            echo "Build Tag: ${IMAGE_TAG}"
+            echo "Latest Tag Updated"
+        }
+
+        failure {
+            echo "Deployment Failed"
+        }
+
+        always {
+            sh '''
+                docker rm -f backend-test || true
+                rm -f backend-latest.tar || true
+                docker image prune -f || true
+            '''
+        }
+    }
+}

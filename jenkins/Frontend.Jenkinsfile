@@ -1,0 +1,167 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "moinnaik/portfolio-frontend"
+        IMAGE_TAG  = "${BUILD_NUMBER}"
+        LATEST_TAG = "latest"
+
+        WORKER1 = "10.0.2.145"
+        WORKER2 = "10.0.2.151"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'prod',
+                    url: 'https://github.com/MoinMN/production-grade-mern-k8s-devops-project.git'
+            }
+        }
+
+        stage('Frontend Pipeline') {
+
+            when {
+                changeset "app/frontend/**"
+            }
+
+            stages {
+
+                stage('Build Docker Image') {
+                    steps {
+                        sh """
+                            docker build \
+                            -t ${IMAGE_NAME}:${IMAGE_TAG} \
+                            -t ${IMAGE_NAME}:${LATEST_TAG} \
+                            app/frontend
+                        """
+                    }
+                }
+
+                stage('DockerHub Login') {
+                    steps {
+                        withCredentials([
+                            usernamePassword(
+                                credentialsId: 'docker',
+                                usernameVariable: 'DOCKER_USER',
+                                passwordVariable: 'DOCKER_PASS'
+                            )
+                        ]) {
+                            sh '''
+                                echo $DOCKER_PASS | docker login \
+                                -u $DOCKER_USER \
+                                --password-stdin
+                            '''
+                        }
+                    }
+                }
+
+                stage('Push To DockerHub') {
+                    steps {
+                        sh """
+                            docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                            docker push ${IMAGE_NAME}:${LATEST_TAG}
+                        """
+                    }
+                }
+
+                stage('Create Offline Image Tar') {
+                    steps {
+                        sh """
+                            docker save \
+                            -o frontend-latest.tar \
+                            ${IMAGE_NAME}:latest
+                        """
+                    }
+                }
+
+                stage('Copy Tar To Worker-1') {
+                    steps {
+                        sshagent(['worker-ssh']) {
+                            sh """
+                                scp -o StrictHostKeyChecking=no \
+                                frontend-latest.tar \
+                                ubuntu@${WORKER1}:/tmp/
+                            """
+                        }
+                    }
+                }
+
+                stage('Import Image Worker-1') {
+                    steps {
+                        sshagent(['worker-ssh']) {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no \
+                                ubuntu@${WORKER1} \
+                                'sudo ctr -n k8s.io images import /tmp/frontend-latest.tar'
+                            """
+                        }
+                    }
+                }
+
+                stage('Copy Tar To Worker-2') {
+                    steps {
+                        sshagent(['worker-ssh']) {
+                            sh """
+                                scp -o StrictHostKeyChecking=no \
+                                frontend-latest.tar \
+                                ubuntu@${WORKER2}:/tmp/
+                            """
+                        }
+                    }
+                }
+
+                stage('Import Image Worker-2') {
+                    steps {
+                        sshagent(['worker-ssh']) {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no \
+                                ubuntu@${WORKER2} \
+                                'sudo ctr -n k8s.io images import /tmp/frontend-latest.tar'
+                            """
+                        }
+                    }
+                }
+
+                stage('Deploy To Kubernetes') {
+                    steps {
+                        withCredentials([
+                            file(
+                                credentialsId: 'kubeconfig',
+                                variable: 'KUBECONFIG_FILE'
+                            )
+                        ]) {
+                            sh '''
+                                export KUBECONFIG=$KUBECONFIG_FILE
+
+                                kubectl rollout restart deployment/frontend \
+                                -n portfolio
+
+                                kubectl rollout status deployment/frontend \
+                                -n portfolio --timeout=300s
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Frontend Deployment Successful"
+            echo "Build Tag: ${IMAGE_TAG}"
+            echo "Latest Tag Updated"
+        }
+
+        failure {
+            echo "Frontend Deployment Failed"
+        }
+
+        always {
+            sh '''
+                rm -f frontend-latest.tar || true
+                docker image prune -f || true
+            '''
+        }
+    }
+}

@@ -1,379 +1,315 @@
-# Production Grade MERN Stack Application Deployment on Kubernetes
+# Production-Grade MERN Stack DevOps Project 🚀
 
-## Project Overview
+A complete end-to-end Production-Grade MERN Stack deployment on AWS using Kubernetes, Jenkins CI/CD, Docker, MongoDB Replica Set, ELK Stack, NGINX Ingress, and HTTPS.
 
-This project demonstrates deployment of a Production Grade MERN (MongoDB, Express.js, React.js, Node.js) application on a Kubernetes cluster using DevOps best practices.
+## 📌 Project Overview
 
-The project includes:
+This project demonstrates how a modern MERN Stack application can be deployed and managed in a production-like environment using DevOps best practices.
 
-* Dockerized MERN Application
-* Kubernetes Deployments and Services
-* MongoDB StatefulSet
+The application consists of:
+
+* Frontend (React + Vite)
+* Backend (Node.js + Express)
+* MongoDB Replica Set
+* Kubernetes Cluster
+* Jenkins CI/CD
+* Docker & DockerHub
+* ELK Stack (Elasticsearch, Kibana, Filebeat, Metricbeat)
+* Elastic APM
 * NGINX Ingress Controller
-* Jenkins CI/CD Integration
-* AWS EC2 Infrastructure
-* Calico CNI Networking
-* High Availability Frontend and Backend Pods
+* Let's Encrypt SSL Certificates
 
 ---
 
-# Architecture
+## 🏗 Infrastructure Architecture
 
-## Components
+### AWS Infrastructure
 
-### Frontend
+* VPC
+* Public Subnet
+* Private Subnets
+* Security Groups
+* EC2 Instances
 
-* React Application
-* Docker Image: `frontend:v1`
-* Replicas: 2
+### Kubernetes Cluster
+
+| Node           | Role                       |
+| -------------- | -------------------------- |
+| Master Node    | Kubernetes Control Plane   |
+| Worker Node 1  | Application Workloads      |
+| Worker Node 2  | Application Workloads      |
+| Jenkins Server | CI/CD                      |
+| ELK Server     | Monitoring & Observability |
+
+---
+
+## ☸ Kubernetes Components
 
 ### Backend
 
-* Node.js / Express Application
-* Docker Image: `backend:v1`
-* Replicas: 2
+* Deployment
+* Service (ClusterIP)
+* Health Checks
+* Rolling Updates
+* 2 Replicas
 
-### Database
+### Frontend
 
-* MongoDB StatefulSet
-* Replicas: 2
-* Persistent Storage enabled
+* Deployment
+* Service (ClusterIP)
+* NGINX-based Container
+* 2 Replicas
+
+### MongoDB
+
+* StatefulSet
+* Headless Service
+* 3 Pod Replica Set
+* Automatic Synchronization
 
 ### Ingress
 
 * NGINX Ingress Controller
-* External access through HTTP (Port 80)
+* TLS Termination
+* Domain Routing
 
 ---
 
-# Project Structure
+## 🔄 CI/CD Pipeline
+
+### Backend Pipeline
+
+1. Checkout Source Code
+2. Install Dependencies
+3. Build Docker Image
+4. Health Check Validation
+5. Push Image to DockerHub
+6. Create Offline TAR Image
+7. Copy Image to Worker Nodes
+8. Import Image into Containerd
+9. Kubernetes Rollout Deployment
+
+### Frontend Pipeline
+
+1. Checkout Source Code
+2. Install Dependencies
+3. Build React Application
+4. Build Docker Image
+5. Health Check Validation
+6. Push Image to DockerHub
+7. Create Offline TAR Image
+8. Copy Image to Worker Nodes
+9. Import Image into Containerd
+10. Kubernetes Rollout Deployment
+
+---
+
+## 🐳 Container Registry
+
+DockerHub Images:
+
+Backend:
+
+moinnaik/portfolio-backend
+
+Frontend:
+
+moinnaik/portfolio-frontend
+
+Tagging Strategy:
+
+* latest
+* Build Number Tags
+
+Example:
+
+moinnaik/portfolio-backend:latest
+
+moinnaik/portfolio-backend:25
+
+---
+
+## 📊 Monitoring & Observability
+
+### ELK Stack
+
+* Elasticsearch
+* Kibana
+* Filebeat
+* Metricbeat
+* Fleet Server
+
+### Application Monitoring
+
+Elastic APM:
+
+* Backend Transaction Monitoring
+* API Performance Analysis
+* Error Tracking
+
+### Infrastructure Monitoring
+
+Metricbeat collects:
+
+* CPU Usage
+* Memory Usage
+* Disk Usage
+* Network Statistics
+
+---
+
+## 🔐 Security Features
+
+* HTTPS Enabled
+* Let's Encrypt SSL Certificates
+* TLS Termination at Ingress
+* Private Worker Nodes
+* Restricted Security Groups
+* Internal Service Communication
+
+---
+
+## 🌍 Application Access
+
+Frontend:
+
+https://profile.moinnaik.in
+
+Backend:
+
+Internal Kubernetes Service
+
+Monitoring:
+
+Kibana Dashboard
+
+Jenkins:
+
+https://jenkins.moinnaik.in
+
+---
+
+## 📂 Project Structure
 
 ```text
 .
 ├── app
-│   ├── backend
 │   ├── frontend
-│   ├── db
-│   ├── docker-compose.yml
-│   └── README.md
+│   └── backend
 │
-├── docs
-│   ├── Architecture-Diagram.png
-│   └── High-Level-Diagram.png
+├── kubernetes
+│   ├── frontend
+│   ├── backend
+│   ├── mongodb
+│   ├── cert-manager
+│   └── observability
 │
 ├── jenkins
+│   ├── Frontend.Jenkinsfile
+│   └── Backend.Jenkinsfile
 │
-└── kubernetes
-    ├── backend
-    │   ├── backend-deployment.yaml
-    │   ├── backend-service.yaml
-    │   └── backend.env
-    │
-    ├── frontend
-    │   ├── frontend-configmap.yaml
-    │   ├── frontend-deployment.yaml
-    │   ├── frontend-service.yaml
-    │   ├── ingress-nginx.json
-    │   └── ingress.yaml
-    │
-    └── mongodb
-        ├── mongodb-statefulset.yaml
-        └── pv.yaml
+└── README.md
 ```
+
+## 🚀 Features Implemented
+
+### DevOps
+
+* CI/CD Automation
+* Dockerized Applications
+* Kubernetes Deployments
+* Rolling Updates
+* Health Checks
+* Automated Rollbacks
+
+### High Availability
+
+* Multi-Replica Deployments
+* MongoDB Replica Set
+* Kubernetes Self-Healing
+* Horizontal Pod Autoscaling
+
+### Monitoring
+
+* Centralized Logging
+* Metrics Collection
+* APM Monitoring
+* Infrastructure Visibility
+
+### Security
+
+* SSL/TLS
+* Private Networking
+* Controlled Access
 
 ---
 
-# Infrastructure
+## 🛠 Technology Stack
 
-## AWS EC2 Instances
+### Frontend
 
-### Master Node
+* React
+* Vite
+* Bootstrap
 
-Responsibilities:
+### Backend
 
-* Kubernetes Control Plane
-* NGINX Ingress Controller
+* Node.js
+* Express.js
 
-Security Group Rules:
+### Database
 
-| Port        | Protocol | Purpose               |
-| ----------- | -------- | --------------------- |
-| 22          | TCP      | SSH Access            |
-| 80          | TCP      | Application Access    |
-| All Traffic | All      | Worker Security Group |
+* MongoDB Replica Set
 
----
+### DevOps
 
-### Worker Nodes
+* Docker
+* Kubernetes
+* Jenkins
+* DockerHub
 
-Responsibilities:
+### Monitoring
 
-* Application Workloads
-* MongoDB Pods
-* Frontend Pods
-* Backend Pods
+* Elasticsearch
+* Kibana
+* Filebeat
+* Metricbeat
+* Elastic APM
 
-Security Group Rules:
+### Cloud
 
-| Port        | Protocol | Purpose               |
-| ----------- | -------- | --------------------- |
-| 22          | TCP      | SSH Access            |
-| 80          | TCP      | Application Access    |
-| All Traffic | All      | Worker Security Group |
-| All Traffic | All      | Master Security Group |
+* AWS EC2
+* AWS VPC
 
----
+### Networking
 
-# Kubernetes Components
-
-## Frontend
-
-Deployment:
-
-```bash
-kubectl apply -f kubernetes/frontend/frontend-deployment.yaml
-```
-
-Service:
-
-```bash
-kubectl apply -f kubernetes/frontend/frontend-service.yaml
-```
-
-ConfigMap:
-
-```bash
-kubectl apply -f kubernetes/frontend/frontend-configmap.yaml
-```
+* NGINX Ingress
+* Let's Encrypt
 
 ---
 
-## Backend
+## 📈 Future Enhancements
 
-Deployment:
-
-```bash
-kubectl apply -f kubernetes/backend/backend-deployment.yaml
-```
-
-Service:
-
-```bash
-kubectl apply -f kubernetes/backend/backend-service.yaml
-```
-
----
-
-## MongoDB
-
-Persistent Volume:
-
-```bash
-kubectl apply -f kubernetes/mongodb/pv.yaml
-```
-
-StatefulSet:
-
-```bash
-kubectl apply -f kubernetes/mongodb/mongodb-statefulset.yaml
-```
-
----
-
-## Ingress
-
-Install Ingress Controller:
-
-```bash
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
-```
-
-Deploy Ingress:
-
-```bash
-kubectl apply -f kubernetes/frontend/ingress.yaml
-```
-
----
-
-# Docker Images
-
-Current Version:
-
-```text
-frontend:v1
-backend:v1
-```
-
-Example Build Commands:
-
-```bash
-docker build -t frontend:v1 .
-docker build -t backend:v1 .
-```
-
-Push Images:
-
-```bash
-docker tag frontend:v1 <dockerhub-username>/frontend:v1
-docker push <dockerhub-username>/frontend:v1
-
-docker tag backend:v1 <dockerhub-username>/backend:v1
-docker push <dockerhub-username>/backend:v1
-```
-
----
-
-# Kubernetes Verification
-
-Check Nodes:
-
-```bash
-kubectl get nodes
-```
-
-Check Pods:
-
-```bash
-kubectl get pods -A
-```
-
-Check Services:
-
-```bash
-kubectl get svc -A
-```
-
-Check Ingress:
-
-```bash
-kubectl get ingress -A
-```
-
-Check Endpoints:
-
-```bash
-kubectl get endpoints -A
-```
-
----
-
-# Troubleshooting Performed
-
-## Issue
-
-After AWS EC2 reboot:
-
-* Application inaccessible through Ingress
-* HTTP 504 Gateway Timeout
-* Ingress unable to connect to frontend pods
-
-Example Error:
-
-```text
-504 Gateway Timeout
-upstream timed out while connecting to upstream
-```
-
----
-
-## Root Cause
-
-AWS Security Groups were not allowing required traffic between Master and Worker Nodes.
-
-Ingress Controller running on Master Node could not communicate with application pods hosted on Worker Nodes.
-
----
-
-## Resolution
-
-Updated Security Groups:
-
-### Master Security Group
-
-* TCP 22
-* TCP 80
-* All Traffic from Worker Security Group
-
-### Worker Security Group
-
-* TCP 22
-* TCP 80
-* All Traffic from Worker Security Group
-* All Traffic from Master Security Group
-
-After updating Security Groups:
-
-* Pod-to-Pod communication restored
-* Ingress connectivity restored
-* Application became accessible successfully
-
----
-
-# Useful Commands
-
-View Pods:
-
-```bash
-kubectl get pods -o wide -A
-```
-
-View Services:
-
-```bash
-kubectl get svc -A
-```
-
-View Ingress:
-
-```bash
-kubectl get ingress -A
-```
-
-Ingress Logs:
-
-```bash
-kubectl logs -n ingress-nginx deployment/ingress-nginx-controller
-```
-
-Check Endpoints:
-
-```bash
-kubectl get endpoints -A
-```
-
-Launch Debug Pod:
-
-```bash
-kubectl run netshoot \
---image=nicolaka/netshoot \
--it --rm
-```
-
-Test Service:
-
-```bash
-curl http://frontend-service
-curl http://backend-service
-```
-
----
-
-# Future Enhancements
-
-* Jenkins CI/CD Pipeline
-* Docker Hub Automated Image Updates
-* HTTPS using Cert Manager
-* AWS Route53 Domain Integration
-* Monitoring using Prometheus & Grafana
-* Logging using ELK Stack
-* Horizontal Pod Autoscaling (HPA)
+* Terraform Infrastructure Provisioning
 * ArgoCD GitOps Deployment
+* SonarQube Integration
+* Trivy Security Scanning
+* Prometheus & Grafana
+* AWS ECR Migration
+* Automated Backups to S3
 
 ---
 
-# Author
+## 👨‍💻 Author
 
 Moin Mohammed Naik
 
-DevOps Engineer | System Administrator | Kubernetes Enthusiast
+* GitHub: https://github.com/MoinMN
+* LinkedIn: https://www.linkedin.com/in/moinnaik
+* Portfolio: https://moinnaik.in
+
+---
+
+## ⭐ Project Goal
+
+To demonstrate real-world DevOps practices by deploying a production-grade MERN Stack application with CI/CD, Kubernetes orchestration, monitoring, logging, scalability, security, and high availability on AWS.
