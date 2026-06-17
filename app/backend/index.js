@@ -38,6 +38,7 @@ connectDB();
 // Health Check API
 app.get("/health", (req, res) => {
   res.status(200).json({
+    data: "this is change",
     status: "UP",
     pod: os.hostname(),
     timestamp: new Date().toISOString(),
