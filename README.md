@@ -75,6 +75,8 @@ The platform hosts my personal portfolio website and showcases my DevOps, Cloud,
 | Master Node    | Kubernetes Control Plane |
 | Worker Node 1  | Application Workloads    |
 | Worker Node 2  | Application Workloads    |
+| Worker Node 3  | MongoDB Pods             |
+| Worker Node 4  | MongoDB Pods             |
 | Jenkins Server | CI/CD Automation         |
 | ELK Server     | Logging & Monitoring     |
 
